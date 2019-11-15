@@ -56,12 +56,13 @@ const listener = app.listen(process.env.PORT || 3000, () => {
 var Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
-  userId : {type: Number},
   username : {type: String, required: true}
 })
 
+var ObjectId = mongoose.Schema.Types.ObjectId
+
 var ExerciseSchema = new Schema({
-  userId : { type : Number, required: true },
+  userId : { type : ObjectId, required: true },
   description : { type: String, required: true },
   duration : { type: Number, required: true },
   date : { type : Date }
@@ -73,15 +74,11 @@ var Exercise = mongoose.model('Exercise', ExerciseSchema)
 // API
 app.post('/api/exercise/new-user', function(req, res) {
   
-  User.countDocuments({}, function (err, count) {
-    if(err) console.error(err)
+  User.create({ username : req.body.username}, function(err, user) {
+    if(err) console.err(err)
 
-    User.create({ username : req.body.username, userId : count + 1}, function(err, user) {
-      if(err) console.err(err)
-      
-      res.json({ userId: user.userId, username: user.username })
-    
-    })
+    res.json({ userId: user._id, username: user.username })
+
   })
 })
 
